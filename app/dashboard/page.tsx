@@ -51,6 +51,7 @@ export default function DashboardPage() {
         sort: sortBy,
         filter: typeFilter,
       });
+      console.log("data", data);
       setFiles(data);
       // setFilteredFiles(data);
     } catch (error) {
@@ -60,9 +61,9 @@ export default function DashboardPage() {
     }
   };
 
-  const handleFileUploaded = (newFile: MediaFile) => {
-    setFiles((prev) => [newFile, ...prev]);
-    // setFilteredFiles((prev) => [newFile, ...prev]);
+  const handleFileUploaded = (newFiles: MediaFile[]) => {
+    setFiles((prev) => [...newFiles, ...prev]);
+    // setFilteredFiles((prev) => [...newFiles, ...prev]);
   };
 
   if (!isAuthenticated) {
@@ -139,7 +140,6 @@ export default function DashboardPage() {
                 <Button onClick={clearFilters}>Clear Filters</Button>
               </div>
             </div>
-
             <FileGrid
               files={files}
               loading={loading}

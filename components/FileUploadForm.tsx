@@ -12,24 +12,22 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { uploadFile } from "@/lib/api";
 import type { MediaFile } from "@/lib/types";
-import { Upload, X, ImageIcon, Video } from "lucide-react";
+import { Upload, X, ImageIcon, Video, File as FileIcon } from "lucide-react";
 
 interface FileUploadFormProps {
-  onFileUploaded: (file: MediaFile) => void;
+  onFileUploaded: (files: MediaFile[]) => void;
 }
 
 export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      setSelectedFile(acceptedFiles[0]);
-      setError("");
-    }
+    setSelectedFiles((prev) => [...prev, ...acceptedFiles]);
+    setError("");
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -41,8 +39,14 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
       "application/pdf": [".pdf"],
     },
     maxSize: 500 * 1024 * 1024, // 500MB
-    multiple: false,
+    multiple: true,
   });
+
+  const removeFile = (indexToRemove: number) => {
+    setSelectedFiles(
+      selectedFiles.filter((_, index) => index !== indexToRemove)
+    );
+  };
 
   const addTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -57,8 +61,8 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) {
-      setError("Please select a file to upload");
+    if (selectedFiles.length === 0) {
+      setError("Please select at least one file to upload");
       return;
     }
 
@@ -66,15 +70,15 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
     setError("");
 
     try {
-      const uploadedFile = await uploadFile(selectedFile, tags);
-      onFileUploaded(uploadedFile);
+      const uploadedFiles = await uploadFile(selectedFiles, tags);
+      onFileUploaded(uploadedFiles);
 
       // Reset form
-      setSelectedFile(null);
+      setSelectedFiles([]);
       setTags([]);
       setTagInput("");
     } catch (err) {
-      setError("Failed to upload file. Please try again.");
+      setError("Failed to upload files. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -84,7 +88,7 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
     if (file.type.startsWith("image/"))
       return <ImageIcon className="h-5 w-5" />;
     if (file.type.startsWith("video/")) return <Video className="h-5 w-5" />;
-    return <ImageIcon className="h-5 w-5" />;
+    return <FileIcon className="h-5 w-5" />;
   };
 
   const formatFileSize = (bytes: number) => {
@@ -102,7 +106,7 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Upload className="h-5 w-5" />
-          <span>Upload File</span>
+          <span>Upload Files (Bulk)</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -122,44 +126,50 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
             }`}
           >
             <input {...getInputProps()} />
-            {selectedFile ? (
-              <div className="space-y-2">
-                <div className="flex items-center justify-center space-x-2">
-                  {getFileIcon(selectedFile)}
-                  <span className="font-medium">{selectedFile.name}</span>
-                </div>
-                <p className="text-sm text-gray-500">
-                  {formatFileSize(selectedFile.size)}
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedFile(null);
-                  }}
-                >
-                  Remove
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Upload className="h-8 w-8 mx-auto text-gray-400" />
-                <p className="text-sm text-gray-600">
-                  {isDragActive
-                    ? "Drop the file here..."
-                    : "Drag & drop a file here, or click to select"}
-                </p>
-                <p className="text-xs text-gray-500">
-                  Supports images, videos, audio, and PDFs (max 500MB)
-                </p>
-              </div>
-            )}
+            <div className="space-y-2">
+              <Upload className="h-8 w-8 mx-auto text-gray-400" />
+              <p className="text-sm text-gray-600">
+                {isDragActive
+                  ? "Drop the files here..."
+                  : "Drag & drop files here, or click to select"}
+              </p>
+              <p className="text-xs text-gray-500">
+                Max 10 files recommended. Supports images, videos, audio, PDF.
+              </p>
+            </div>
           </div>
 
+          {selectedFiles.length > 0 && (
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              <Label>Selected Files ({selectedFiles.length})</Label>
+              {selectedFiles.map((file, index) => (
+                <div
+                  key={`${file.name}-${index}`}
+                  className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
+                >
+                  <div className="flex items-center space-x-2 truncate">
+                    {getFileIcon(file)}
+                    <span className="truncate max-w-[200px]">{file.name}</span>
+                    <span className="text-gray-500 text-xs">
+                      ({formatFileSize(file.size)})
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-red-500"
+                    onClick={() => removeFile(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags</Label>
+            <Label htmlFor="tags">Tags (Applied to all)</Label>
             <div className="flex space-x-2">
               <Input
                 id="tags"
@@ -199,9 +209,13 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
           <Button
             type="submit"
             className="w-full"
-            disabled={uploading || !selectedFile}
+            disabled={uploading || selectedFiles.length === 0}
           >
-            {uploading ? "Uploading..." : "Upload File"}
+            {uploading
+              ? "Uploading..."
+              : `Upload ${selectedFiles.length} File${
+                  selectedFiles.length !== 1 ? "s" : ""
+                }`}
           </Button>
         </form>
       </CardContent>

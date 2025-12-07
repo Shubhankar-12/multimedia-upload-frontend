@@ -67,17 +67,32 @@ export const fetchFiles = async ({
     throw new Error("Failed to fetch files");
   }
 
-  const files = await response.json();
-  return files.result;
+  const json = await response.json();
+
+  // CRITICAL: Extract from response.data[0].paginatedResults
+  // Support both direct array body or { data: [...] } wrapper for robustness
+  console.log("json", json);
+
+  const data = json.result;
+  console.log("json.data", data);
+
+  if (Array.isArray(data) && data.length > 0) {
+    return data;
+  }
+  return [];
 };
 
 export const uploadFile = async (
-  file: File,
+  files: File[],
   tags: string[]
-): Promise<MediaFile> => {
+): Promise<MediaFile[]> => {
   const token = localStorage.getItem("token");
   const formData = new FormData();
-  formData.append("document", file);
+
+  files.forEach((file) => {
+    formData.append("documents", file);
+  });
+
   formData.append("tags", JSON.stringify(tags));
 
   const response = await fetch(`${API_BASE_URL}/files/upload`, {
@@ -89,7 +104,67 @@ export const uploadFile = async (
   });
 
   if (!response.ok) {
-    throw new Error("Failed to upload file");
+    throw new Error("Failed to upload files");
+  }
+
+  const data = await response.json();
+  // Handle case where backend returns { result: MediaFile[], metadata: ... }
+  if (data.result && Array.isArray(data.result)) {
+    return data.result;
+  }
+  return Array.isArray(data) ? data : [];
+};
+
+export const shareFile = async (
+  fileId: string,
+  email: string
+): Promise<void> => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_BASE_URL}/files/${fileId}/share`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to share file");
+  }
+};
+
+export const generateLink = async (
+  fileId: string
+): Promise<{ url: string }> => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_BASE_URL}/files/${fileId}/link`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to generate link");
+  }
+
+  return response.json();
+};
+
+export const getSharedFile = async (token: string): Promise<MediaFile> => {
+  const authToken = localStorage.getItem("token");
+  const response = await fetch(`${API_BASE_URL}/shared/${token}`, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Unauthorized");
+    }
+    throw new Error("Failed to fetch shared file");
   }
 
   return response.json();

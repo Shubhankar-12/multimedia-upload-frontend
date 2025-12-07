@@ -6,8 +6,11 @@ export interface MediaFile {
   url: string;
   tags: string[];
   viewCount: number;
+  view_count?: number; // Backend compatibility
   createdAt: string;
+  created_at?: string; // Backend compatibility
   updatedAt: string;
+  updated_at?: string; // Backend compatibility
 }
 
 export interface AuthResponse {
