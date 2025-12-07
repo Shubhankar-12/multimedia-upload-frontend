@@ -146,7 +146,8 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
                   : "Drag & drop files here, or click to select"}
               </p>
               <p className="text-xs text-gray-500">
-                Max 10 files recommended. Supports images, videos, audio, PDF.
+                Max 10 files recommended. Supports images, videos, spreadsheets,
+                PDF.
               </p>
             </div>
           </div>
