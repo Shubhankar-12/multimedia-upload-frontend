@@ -4,13 +4,12 @@ A modern web application for uploading and managing multimedia files. Built with
 
 ## Features
 
-- User authentication (login/register)
-- Drag and drop file uploads
-- File management dashboard
-- Search and filter functionality
-- Tag-based organization
-- View count tracking
-- Responsive design
+- **Secure Authentication**: User Login and Registration.
+- **Bulk Upload**: Drag & drop support for multiple files (Images, Videos, Audio, PDFs, Spreadsheets).
+- **File Sharing**: Share files securely via Email or generate public links.
+- **Smart Management**: Filter files by type, search by tags, and sort by views or date.
+- **Responsive Design**: Clean UI built with Tailwind CSS and shadcn/ui.
+- **Public Shared View**: Dedicated access page for shared links.
 
 ## Technology Stack
 
@@ -64,16 +63,17 @@ src/
 ├── app/                 # Next.js App Router pages
 │   ├── login/           # Authentication pages
 │   ├── register/
-│   └── dashboard/       # Main application
+│   ├── dashboard/       # Main application
+│   └── shared/          # Shared file viewer
 ├── components/          # Reusable UI components
 │   ├── FileUploadForm/  # File upload component
 │   ├── FileGrid/        # File display grid
+│   ├── ShareDialog/     # Sharing modal
 │   ├── Header/          # Header component
 │   ├── FileCard/        # File card component
 │   └── SearchBar/       # Search and filter
 ├── lib/                 # Utilities and API helpers
-├── hooks/               # Custom React hooks
-└── styles/              # Global styles
+└── hooks/               # Custom React hooks
 ```
 
 ## Key Pages
@@ -86,18 +86,22 @@ src/
 ### Dashboard
 
 - `/dashboard` - Main file management interface
-  - File upload area
-  - Search and filtering
-  - File grid with thumbnails
-  - Delete and view tracking
+  - **Bulk Upload**: Supports up to 10 files (Images, Videos, PDFs, CSV/Excel).
+  - **Filtering**: Type, Search, and Sort controls.
+  - **Sharing**: Generate links or invite users via email.
+
+### Shared View
+
+- `/shared/[token]` - Public read-only view for shared files.
 
 ## How to Use
 
-1. **Create Account**: Register a new account or login with existing credentials
-2. **Upload Files**: Drag and drop files or click to select
-3. **Add Tags**: Organize files with comma-separated tags
-4. **Manage Files**: Search, filter, and delete files as needed
-5. **Track Views**: Click on files to increment view count
+1. **Create Account**: Register a new account or login.
+2. **Upload Files**: Drag and drop multiple files (including spreadsheets).
+3. **Share Files**: Click the menu on any file card to open the Share Dialog.
+   - **Invite**: Enter an email to share privately.
+   - **Link**: Copy a generated public link.
+4. **Manage**: Filter by "Spreadsheets" or other types, search tags, or sort by views.
 
 ## Available Scripts
 
@@ -120,9 +124,9 @@ pnpm lint
 
 ## Filtering Options
 
-- **Search**: Find files by name or tags
-- **Type Filter**: Filter by file type (image, video, audio, PDF)
-- **Sort Options**: Sort by newest first or most viewed
+- **Search**: Find files by name or tags.
+- **Type Filter**: Images, Videos, Audio, PDFs, Spreadsheets.
+- **Sort Options**: Newest First, Most/Least Views, Size.
 
 ## Backend Integration
 
