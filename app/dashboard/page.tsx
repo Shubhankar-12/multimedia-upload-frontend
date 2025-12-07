@@ -61,9 +61,12 @@ export default function DashboardPage() {
     }
   };
 
-  const handleFileUploaded = (newFiles: MediaFile[]) => {
-    setFiles((prev) => [...newFiles, ...prev]);
-    // setFilteredFiles((prev) => [...newFiles, ...prev]);
+  const handleFileUploaded = async () => {
+    try {
+      await loadFiles();
+    } catch (error) {
+      console.error("Failed to load files:", error);
+    }
   };
 
   if (!isAuthenticated) {
