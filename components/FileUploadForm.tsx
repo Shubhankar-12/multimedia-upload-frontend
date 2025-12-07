@@ -37,6 +37,11 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
       "video/*": [".mp4", ".mov", ".avi", ".mkv"],
       "audio/*": [".mp3", ".wav", ".ogg"],
       "application/pdf": [".pdf"],
+      "text/csv": [".csv"],
+      "application/vnd.ms-excel": [".xls"],
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+        ".xlsx",
+      ],
     },
     maxSize: 500 * 1024 * 1024, // 500MB
     multiple: true,
@@ -88,6 +93,13 @@ export function FileUploadForm({ onFileUploaded }: FileUploadFormProps) {
     if (file.type.startsWith("image/"))
       return <ImageIcon className="h-5 w-5" />;
     if (file.type.startsWith("video/")) return <Video className="h-5 w-5" />;
+    if (
+      file.type === "text/csv" ||
+      file.type === "application/vnd.ms-excel" ||
+      file.type ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+      return <FileIcon className="h-5 w-5 text-green-600" />;
     return <FileIcon className="h-5 w-5" />;
   };
 

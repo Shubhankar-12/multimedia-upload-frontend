@@ -7,9 +7,7 @@ export interface MediaFile {
   tags: string[];
   viewCount: number;
   view_count?: number; // Backend compatibility
-  createdAt: string;
-  created_at?: string; // Backend compatibility
-  updatedAt: string;
+  created_at: string;
   updated_at?: string; // Backend compatibility
 }
 

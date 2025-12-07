@@ -135,6 +135,7 @@ export default function DashboardPage() {
                     <SelectItem value="video">Videos</SelectItem>
                     <SelectItem value="audio">Audio</SelectItem>
                     <SelectItem value="pdf">PDFs</SelectItem>
+                    <SelectItem value="spreadsheet">Spreadsheets</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button onClick={clearFilters}>Clear Filters</Button>

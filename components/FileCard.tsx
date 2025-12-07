@@ -45,6 +45,13 @@ export function FileCard({ file, onUpdate }: FileCardProps) {
       return <Music className="h-8 w-8 text-green-500" />;
     if (type === "application/pdf")
       return <FileText className="h-8 w-8 text-red-500" />;
+    if (
+      type === "text/csv" ||
+      type === "application/vnd.ms-excel" ||
+      type ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+      return <FileText className="h-8 w-8 text-green-600" />;
     return <File className="h-8 w-8 text-gray-500" />;
   };
 

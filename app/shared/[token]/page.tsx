@@ -84,7 +84,7 @@ export default function SharedFilePage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{file.name}</h1>
             <p className="text-sm text-gray-500">
-              Shared File • {new Date(file.createdAt).toLocaleDateString()}
+              Shared File • {new Date(file.created_at).toLocaleDateString()}
             </p>
           </div>
           <Button onClick={handleDownload}>
