@@ -203,3 +203,18 @@ export const incrementViewCount = async (fileId: string): Promise<void> => {
     throw new Error("Failed to increment view count");
   }
 };
+
+export const fetchCurrentUser = async (): Promise<AuthResponse> => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_BASE_URL}/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch current user");
+  }
+
+  return response.json();
+};
