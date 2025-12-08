@@ -126,7 +126,7 @@ export default function SharedFilePage() {
 
         <div className="bg-gray-50 px-6 py-4 border-t">
           <p className="text-xs text-center text-gray-500">
-            Shared via Absiduous Media Secure Link
+            Shared via Multimedia Upload Secure Link
           </p>
         </div>
       </div>
